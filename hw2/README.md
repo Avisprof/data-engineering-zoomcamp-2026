@@ -33,6 +33,9 @@ Make sure that all data was fetched:
 
 Because in this questions uses 2020 year, I also run `Backfill executions` from 01.01.2020 till 02.12.2020 separatly for `green` and `yellow` taxi
 
+![quiz_1](images/quiz_1.png)
+
+Ans: 128.3 Mb
 
 2) What is the rendered value of the variable `file` when the inputs `taxi` is set to `green`, `year` is set to `2020`, and `month` is set to `04` during execution?
 
@@ -43,8 +46,12 @@ Ans: `green_tripdata_2020-04.csv`
 ```sql
 SELECT COUNT(*) AS total
 FROM public.yellow_tripdata
-WHERE EXTRACT(YEAR FROM lpep_pickup_datetime) = 2020;
+WHERE EXTRACT(YEAR FROM tpep_pickup_datetime) = 2020;
 ```
+
+![quiz_3](images/quiz_3.png)
+
+Ans: 24,648,499
 
 4) How many rows are there for the `Green` Taxi data for all CSV files in the year 2020?
 
@@ -54,4 +61,31 @@ FROM public.green_tripdata
 WHERE EXTRACT(YEAR FROM lpep_pickup_datetime) = 2020;
 ```
 
-[qui]
+![quiz_4](images/quiz_4.png)
+
+Ans: 1,734,051
+
+5) How many rows are there for the `Yellow` Taxi data for the March 2021 CSV file?
+
+```sql
+SELECT COUNT(*) AS total
+FROM public.yellow_tripdata
+WHERE tpep_pickup_datetime >= '2021-03-01'::timestamp
+  AND tpep_pickup_datetime < '2021-04-01'::timestamp;
+```
+
+![quiz_5](images/quiz_5.png)
+
+Ans: 1,925,152
+
+6) How would you configure the timezone to New York in a Schedule trigger?
+
+```text
+triggers:
+  - id: daily
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "@daily"
+    timezone: America/New_York
+```
+
+Ans: Add a `timezone` property set to `America/New_York` in the `Schedule` trigger configuration
