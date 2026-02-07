@@ -14,7 +14,7 @@ https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
 Use the [load_yellow_taxi_data.py](./load_yellow_taxi_data.py) script to load the data into your GCS bucket:
 
-```python
+```bash
 python load_yellow_taxi_data.py 
 ```
 
