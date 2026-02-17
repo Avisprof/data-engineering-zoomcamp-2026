@@ -13,3 +13,11 @@ trips_unioned as (
 )
 
 select * from trips_unioned
+
+
+--select 
+--    pickup_location_id,
+--    sum(1) as count
+--from trips_unioned 
+--group by 1
+--order by count desc

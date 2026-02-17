@@ -215,4 +215,6 @@ data/
 dbt/target/
 dbt/dbt_packages/
 dbt/logs/
-*.duckdb
+*.duckdb*
+
+.vscode
