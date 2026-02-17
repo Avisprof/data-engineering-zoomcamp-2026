@@ -10,6 +10,60 @@ Load the Green and Yellow taxi data for 2019-2020 into your warehouse
 python ingest.py
 ```
 
+## Step 1: Install DuckDB
+
+```bash
+curl https://install.duckdb.org | sh
+```
+
+## Step 2: Install dbt
+
+```bash
+pip install dbt-duckdb
+```
+
+## Step 3: Configure dbt Profile
+
+### Create or Update `~/.dbt/profiles.yml`
+
+The dbt profile tells dbt how to connect to your database. Create or update the file `~/.dbt/profiles.yml` with the following content:
+
+```yaml
+taxi_rides_ny:
+  target: dev
+  outputs:
+    # DuckDB Development profile
+    dev:
+      type: duckdb
+      path: taxi_rides_ny.duckdb
+      schema: dev
+      threads: 1
+      extensions:
+        - parquet
+      settings:
+        memory_limit: '2GB'
+        preserve_insertion_order: false
+
+    # DuckDB Production profile
+    prod:
+      type: duckdb
+      path: taxi_rides_ny.duckdb
+      schema: prod
+      threads: 1
+      extensions:
+        - parquet
+      settings:
+        memory_limit: '2GB'
+        preserve_insertion_order: false
+
+### Step 4
+
+```bash
+dbt deps
+dbt seed
+dbt run
+```
+
 Run `dbt build --target prod` to create all models and run tests
 
 ### Question 1. dbt Lineage and Execution
