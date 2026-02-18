@@ -100,7 +100,7 @@ Ans: dbt will fail the test, returning a non-zero exit code.
 
 ### Question 3. Counting Records in `fct_monthly_zone_revenue`
 
-See solution in the [notebook](./notebook.ipynb)
+See solution in the [nonotebook.ipynb](./notebook.ipynb)
 
 ```python
 DB_PATH = 'taxi_rides_ny.duckdb'
