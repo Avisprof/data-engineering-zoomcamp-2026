@@ -55,6 +55,7 @@ taxi_rides_ny:
       settings:
         memory_limit: '2GB'
         preserve_insertion_order: false
+```
 
 ### Step 4
 
@@ -71,6 +72,7 @@ models/
 │   └── stg_yellow_tripdata.sql
 └── intermediate/
     └── int_trips_unioned.sql (depends on stg_green_tripdata & stg_yellow_tripdata)
+```
 
 If you run `dbt run --select int_trips_unioned`, what models will be built?
 
@@ -98,13 +100,31 @@ Ans: dbt will fail the test, returning a non-zero exit code.
 
 ### Question 3. Counting Records in `fct_monthly_zone_revenue`
 
+See solution in the [notebook](notebook.ipynb)
+
+```python
+DB_PATH = 'taxi_rides_ny.duckdb'
+conn = duckdb.connect(DB_PATH)
+analyze_duckdb_database()
+```
+
+![pic1](./images/pic1.png)
+
 After running your dbt project, query the `fct_monthly_zone_revenue` model.
 
 What is the count of records in the `fct_monthly_zone_revenue` model?
 
-```sql
-select count(*) from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
+```python
+schema_name = 'prod'
+table_name = 'fct_monthly_zone_revenue'
+row_count = conn.execute(f"""
+                SELECT COUNT(*) FROM "{schema_name}"."{table_name}"
+            """).fetchone()[0]
+
+print(f"  Table: {table_name}: row count {row_count:,}")
 ```
+
+Table: fct_monthly_zone_revenue: row count 12,184
 
 ![question3](./images/q3.png)
 
@@ -114,14 +134,21 @@ Ans: 12184
 
 Using the `fct_monthly_zone_revenue` table, find the pickup zone with the **highest total revenue** (`revenue_monthly_total_amount`) for **Green** taxi trips in 2020.
 
-```sql
-select 
-    pickup_zone,
-    sum(revenue_monthly_total_amount) as revenue_monthly_total_amount
-from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
-where service_type = 'Green' and revenue_month >= '2020-01-01'
-group by pickup_zone
-order by revenue_monthly_total_amount desc
+```python
+schema_name = 'prod'
+table_name = 'fct_monthly_zone_revenue'
+df = conn.execute(f"""
+                SELECT 
+                  pickup_zone,
+                  SUM(revenue_monthly_total_amount) as revenue_monthly_total_amount 
+                FROM "{schema_name}"."{table_name}"
+                WHERE service_type = 'Green' 
+                    AND revenue_month >= '2020-01-01'
+                GROUP BY pickup_zone
+                ORDER BY revenue_monthly_total_amount desc
+                LIMIT 5
+                """).df()
+df.head()
 ```
 
 Which zone had the highest revenue?
@@ -134,12 +161,22 @@ Ans: East Harlem North
 
 Using the `fct_monthly_zone_revenue` table, what is the **total number of trips** (`total_monthly_trips`) for Green taxis in October 2019?
 
-```sql
-select 
-    sum(total_monthly_trips)
-from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
-where service_type = 'Green' and revenue_month = '2019-10-01'
+```python
+schema_name = 'prod'
+table_name = 'fct_monthly_zone_revenue'
+df = conn.execute(f"""
+                SELECT 
+                  revenue_month,
+                  SUM(total_monthly_trips) as total_monthly_trips 
+                FROM "{schema_name}"."{table_name}"
+                WHERE service_type = 'Green' 
+                    AND revenue_month = '2019-10-01'
+                GROUP BY revenue_month
+                """).df()
+df.head()
 ```
+![question5](./images/q5.png)
+
 Ans: 384,624
 
 ### Question 6. Build a Staging Model for FHV Data
@@ -156,7 +193,8 @@ python ingest_fhv.py
    - Filter out records where `dispatching_base_num IS NULL`
    - Rename fields to match your project's naming conventions (e.g., `PUlocationID` → `pickup_location_id`)
 
-What is the count of records in `stg_fhv_tripdata`?
+
+stg_fhv_tripdata: 
 
 ```sql
 with source as (
@@ -182,9 +220,20 @@ renamed as (
     where dispatching_base_num is not null
 )
 
-select count(*) from renamed
+```
+
+What is the count of records in `stg_fhv_tripdata`?
+
+```python
+schema_name = 'prod'
+table_name = 'fhv_tripdata'
+row_count = conn.execute(f"""
+                SELECT COUNT(*) FROM "{schema_name}"."{table_name}"
+            """).fetchone()[0]
+
+print(f"  Table: {table_name}: row count {row_count:,}")
 ```
 
 ![question6](./images/q6.png)
 
-Ans: - 43,244,693
+Ans: 43,244,693
