@@ -58,12 +58,6 @@ taxi_rides_ny:
 
 ### Step 4
 
-```bash
-dbt deps
-dbt seed
-dbt run
-```
-
 Run `dbt build --target prod` to create all models and run tests
 
 ### Question 1. dbt Lineage and Execution
@@ -109,24 +103,44 @@ After running your dbt project, query the `fct_monthly_zone_revenue` model.
 What is the count of records in the `fct_monthly_zone_revenue` model?
 
 ```sql
-select count(*) from {{ ref('fct_monthly_zone_revenue')  }}
+select count(*) from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
 ```
+
+![question3](./images/q3.png)
+
+Ans: 12184
 
 ### Question 4. Best Performing Zone for Green Taxis (2020)
 
 Using the `fct_monthly_zone_revenue` table, find the pickup zone with the **highest total revenue** (`revenue_monthly_total_amount`) for **Green** taxi trips in 2020.
 
 ```sql
-select
-  pickup_zone_id,
-  total_revenue
+select 
+    pickup_zone,
+    sum(revenue_monthly_total_amount) as revenue_monthly_total_amount
+from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
+where service_type = 'Green' and revenue_month >= '2020-01-01'
+group by pickup_zone
+order by revenue_monthly_total_amount desc
 ```
 
 Which zone had the highest revenue?
 
+![question4](./images/q4.png)
+
+Ans: East Harlem North
+
 ### Question 5. Green Taxi Trip Counts (October 2019)
 
 Using the `fct_monthly_zone_revenue` table, what is the **total number of trips** (`total_monthly_trips`) for Green taxis in October 2019?
+
+```sql
+select 
+    sum(total_monthly_trips)
+from "taxi_rides_ny"."prod"."fct_monthly_zone_revenue"
+where service_type = 'Green' and revenue_month = '2019-10-01'
+```
+Ans: 384,624
 
 ### Question 6. Build a Staging Model for FHV Data
 
@@ -171,6 +185,6 @@ renamed as (
 select count(*) from renamed
 ```
 
-![question6](/q6.png)
+![question6](./images/q6.png)
 
 Ans: - 43,244,693
