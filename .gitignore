@@ -225,3 +225,5 @@ logs/runs
 logs/*.log
 *.py[cod]
 bruin/my-taxi-pipeline/duckdb.db
+
+logs/queries

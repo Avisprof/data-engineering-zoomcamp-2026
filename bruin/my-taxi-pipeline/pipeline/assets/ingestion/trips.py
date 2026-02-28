@@ -41,7 +41,7 @@ columns:
 # standard libraries for env vars and JSON handling
 import os
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 # third‑party libraries for HTTP and data processing
 import pandas as pd
@@ -67,41 +67,20 @@ def materialize():
     end = datetime.fromisoformat(end_date)
     print(f"fetching data for {taxi_types} from {start_date} to {end_date}")
 
-    # build list of monthly URLs for each taxi type
-    urls = []
+    # fetch each parquet file, add lineage column, and collect DataFrames
+    dfs = []
     current = start
     while current < end:
         year = current.year
         month = current.month
         for taxi in taxi_types:
-            urls.append(
-                f"https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi}_tripdata_{year}-{month:02d}.parquet"
-            )
+            df = fetch_data(taxi, year, month)
+            dfs.append(df)
         # advance to first of next month
         if month == 12:
             current = datetime(year + 1, 1, 1)
         else:
             current = datetime(year, month + 1, 1)
-
-    # fetch each parquet file, add lineage column, and collect DataFrames
-    dfs = []
-    for url in urls:
-        try:
-            df = pd.read_parquet(url)
-            print(f"fetched {len(df)} rows from {url}")
-            
-            # standardize column names: yellow has tpep_ prefix, green has lpep_ prefix
-            # rename to common names declared in the asset metadata
-            rename_map = {
-                'tpep_pickup_datetime': 'pickup_datetime',
-                'tpep_dropoff_datetime': 'dropoff_datetime',
-                'lpep_pickup_datetime': 'pickup_datetime',
-                'lpep_dropoff_datetime': 'dropoff_datetime',
-            }
-            df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})    
-            dfs.append(df)
-        except Exception as e:
-            print(f"warning: failed to fetch {url}: {e}")
 
     print('combining dataframes...')
     if dfs:
@@ -111,3 +90,22 @@ def materialize():
     else:
         # return empty frame with no columns (Bruin handles schema from header)
         return pd.DataFrame()
+
+def fetch_data(taxi, year, month):
+  url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi}_tripdata_{year}-{month:02d}.parquet"
+  df = pd.read_parquet(url)
+  print(f"fetched {len(df)} rows from {url}")
+  
+  # standardize column names: yellow has tpep_ prefix, green has lpep_ prefix
+  # rename to common names declared in the asset metadata
+  rename_map = {
+      'tpep_pickup_datetime': 'pickup_datetime',
+      'tpep_dropoff_datetime': 'dropoff_datetime',
+      'lpep_pickup_datetime': 'pickup_datetime',
+      'lpep_dropoff_datetime': 'dropoff_datetime',
+      'PULocationID': 'pickup_location_id',
+      'DOLocationID': 'dropoff_location_id',
+  }
+  df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns}) 
+  df['taxi_type'] = taxi  # add column to distinguish yellow vs green
+  return df
