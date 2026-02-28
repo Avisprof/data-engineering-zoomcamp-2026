@@ -1,6 +1,7 @@
 name: my-taxi-pipeline
 schedule: daily
-start_date: "2022-01-01"
+start_date: "2019-01-01"
+end_date: "2019-03-01"
 default_connections:
   duckdb: duckdb-default
 variables:

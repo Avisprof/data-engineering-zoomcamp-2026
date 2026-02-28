@@ -8,9 +8,9 @@ depends:
 
 materialization:
   type: table
-  #strategy: time_interval
-  #incremental_key: pickup_datetime
-  #time_granularity: timestamp
+  strategy: time_interval
+  incremental_key: pickup_datetime
+  time_granularity: timestamp
 
 columns:
   - name: pickup_datetime
@@ -33,6 +33,7 @@ SELECT
     t.pickup_location_id,
     t.dropoff_location_id,
     t.fare_amount,
+    t.taxi_type,
     p.payment_type_name
 FROM ingestion.trips t
 LEFT JOIN ingestion.payment_lookup p
