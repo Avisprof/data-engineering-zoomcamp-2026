@@ -93,7 +93,8 @@ def materialize():
 
 def fetch_data(taxi, year, month):
   print(f'start fetching data {taxi} {year} {month}')
-  url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi}_tripdata_{year}-{month:02d}.parquet"
+  url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{taxi}_tripdata_{year}-{month:02d}.parquet"
+  #url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi}_tripdata_{year}-{month:02d}.parquet"
   print('read parquet from url:', url)
   df = pd.read_parquet(url)
   print(f"fetched {len(df)} rows from {url}")
