@@ -218,3 +218,8 @@ dbt/logs/
 *.duckdb*
 
 .vscode
+
+.bruin.yml
+logs/runs
+logs/*.log
+*.py[cod]

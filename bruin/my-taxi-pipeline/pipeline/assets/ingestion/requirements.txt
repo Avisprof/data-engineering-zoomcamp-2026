@@ -1,0 +1,9 @@
+# Python dependencies required by the ingestion asset.
+# Keep the list minimal and pin versions for reproducibility.
+# Docs: https://getbruin.com/docs/bruin/assets/python
+
+pandas
+requests
+pyarrow
+python-dateutil
+
