@@ -7,9 +7,9 @@ depends:
 
 materialization:
   type: table
-  strategy: time_interval
-  incremental_key: trip_date
-  time_granularity: date
+  #strategy: time_interval
+  #incremental_key: trip_date
+  #time_granularity: date
 
 columns:
   - name: trip_date
