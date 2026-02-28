@@ -103,6 +103,7 @@ def materialize():
         except Exception as e:
             print(f"warning: failed to fetch {url}: {e}")
 
+    print('combining dataframes...')
     if dfs:
         result = pd.concat(dfs, ignore_index=True)
         print("final row count:", len(result))

@@ -1,5 +1,6 @@
 *.parquet
 *.csv
+*.db
 gcs.json
 
 # Byte-compiled / optimized / DLL files
@@ -223,3 +224,4 @@ dbt/logs/
 logs/runs
 logs/*.log
 *.py[cod]
+bruin/my-taxi-pipeline/duckdb.db
