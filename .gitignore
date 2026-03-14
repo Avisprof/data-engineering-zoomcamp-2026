@@ -217,6 +217,8 @@ dbt/target/
 dbt/dbt_packages/
 dbt/logs/
 *.duckdb*
+fhvhv/
+test_range/
 
 .vscode
 
